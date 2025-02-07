@@ -13,13 +13,17 @@ node_modules/
 
 # testing
 /coverage
+**/coverage
 
 # next.js
-/.next/
+.next/
+**/.next/
 /out/
+**/out/
 
 # production
 /build
+**/build
 
 # misc
 .DS_Store
