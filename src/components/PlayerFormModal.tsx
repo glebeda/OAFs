@@ -1,11 +1,11 @@
 import React from 'react';
 import { Dialog } from '@headlessui/react';
-import { Player, CreatePlayerDto } from '@/types';
+import { Player } from '@/types/player';
 
 type PlayerFormModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: CreatePlayerDto) => void;
+  onSubmit: (data: Omit<Player, 'id'>) => void;
   player?: Player;
 };
 

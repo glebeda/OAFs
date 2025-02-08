@@ -27,14 +27,4 @@ export interface UpdatePlayerDto {
   joinedDate?: string;
   gamesPlayed?: number;
   goalsScored?: number;
-}
-
-export interface Game {
-  id: string;
-  date: string;
-  location: string;
-  players: string[];
-  status: 'upcoming' | 'completed' | 'cancelled';
-  createdAt: string;
-  updatedAt: string;
-}
+} 
