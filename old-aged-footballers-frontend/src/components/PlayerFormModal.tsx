@@ -1,159 +1,172 @@
-import { Player } from '@/types';
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
+import React from 'react';
+import { Dialog } from '@headlessui/react';
+import { Player, CreatePlayerDto } from '@/types';
 
-interface PlayerFormModalProps {
+type PlayerFormModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onSubmit: (data: CreatePlayerDto) => void;
   player?: Player;
-  onSubmit: (player: Omit<Player, 'id'>) => void;
-  title: string;
-}
+};
 
-export function PlayerFormModal({ isOpen, onClose, player, onSubmit, title }: PlayerFormModalProps) {
-  // Format today's date as YYYY-MM-DD for the date input
-  const today = new Date().toISOString().split('T')[0];
+export const PlayerFormModal: React.FC<PlayerFormModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  player,
+}) => {
+  const [formData, setFormData] = React.useState({
+    name: player?.name || '',
+    email: player?.email || '',
+    phoneNumber: player?.phoneNumber || '',
+    joinedDate: player?.joinedDate || new Date().toISOString().split('T')[0],
+    isActive: player?.isActive ?? true,
+  });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [nameError, setNameError] = React.useState<string | null>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
-    const playerData = {
-      name: formData.get('name') as string,
-      email: formData.get('email') as string,
-      phoneNumber: formData.get('phoneNumber') as string,
-      isActive: formData.get('isActive') === 'true',
-      joinedDate: formData.get('joinedDate') as string,
-    };
+    setNameError(null);
 
-    onSubmit(playerData);
-    onClose();
+    if (!formData.name.trim()) {
+      setNameError('Name is required');
+      return;
+    }
+
+    onSubmit(formData);
   };
 
   return (
-    <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onClose}>
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
-        </Transition.Child>
-
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
-            >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900 mb-4"
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      className="relative z-10"
+    >
+      <div className="fixed inset-0 bg-black bg-opacity-25" />
+      <div className="fixed inset-0 overflow-y-auto">
+        <div className="flex min-h-full items-center justify-center p-0 sm:p-4 text-center">
+          <Dialog.Panel className="w-full h-full sm:h-auto sm:max-w-md transform overflow-hidden bg-white p-4 sm:p-6 text-left align-middle shadow-xl transition-all sm:rounded-2xl">
+            <Dialog.Title className="text-lg font-medium leading-6 text-gray-900 mb-4">
+              {player ? 'Edit Player' : 'Add New Player'}
+            </Dialog.Title>
+            <form onSubmit={handleSubmit} className="mt-4 space-y-6" noValidate>
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  {title}
-                </Dialog.Title>
-                
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                      Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      id="name"
-                      required
-                      defaultValue={player?.name}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
+                  Name *
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  aria-invalid={!!nameError}
+                  aria-describedby={nameError ? "name-error" : undefined}
+                  className={`mt-1 block w-full rounded-md shadow-sm text-base sm:text-sm
+                    ${nameError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
+                />
+                {nameError && (
+                  <p id="name-error" className="mt-1 text-sm text-red-600" role="alert">
+                    {nameError}
+                  </p>
+                )}
+              </div>
 
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      id="email"
-                      defaultValue={player?.email}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm"
+                />
+              </div>
 
-                  <div>
-                    <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      name="phoneNumber"
-                      id="phoneNumber"
-                      defaultValue={player?.phoneNumber}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
+              <div>
+                <label
+                  htmlFor="phoneNumber"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Phone Number
+                </label>
+                <input
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  type="tel"
+                  value={formData.phoneNumber}
+                  onChange={e => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm"
+                />
+              </div>
 
-                  <div>
-                    <label htmlFor="joinedDate" className="block text-sm font-medium text-gray-700">
-                      Joined Date *
-                    </label>
-                    <input
-                      type="date"
-                      name="joinedDate"
-                      id="joinedDate"
-                      required
-                      defaultValue={player?.joinedDate || today}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
+              <div>
+                <label
+                  htmlFor="joinedDate"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Joined Date *
+                </label>
+                <input
+                  id="joinedDate"
+                  name="joinedDate"
+                  type="date"
+                  required
+                  value={formData.joinedDate}
+                  onChange={e => setFormData(prev => ({ ...prev, joinedDate: e.target.value }))}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm"
+                />
+              </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Status
-                    </label>
-                    <select
-                      name="isActive"
-                      defaultValue={player ? (player.isActive ? 'true' : 'false') : 'true'}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    >
-                      <option value="true">Active</option>
-                      <option value="false">Inactive</option>
-                    </select>
-                  </div>
+              <div>
+                <label
+                  htmlFor="isActive"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Status
+                </label>
+                <select
+                  id="isActive"
+                  name="isActive"
+                  value={formData.isActive.toString()}
+                  onChange={e => setFormData(prev => ({ ...prev, isActive: e.target.value === 'true' }))}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm"
+                >
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+              </div>
 
-                  <div className="mt-6 flex justify-end space-x-3">
-                    <button
-                      type="button"
-                      onClick={onClose}
-                      className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    >
-                      Save
-                    </button>
-                  </div>
-                </form>
-              </Dialog.Panel>
-            </Transition.Child>
-          </div>
+              <div className="mt-6 flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base sm:text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base sm:text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                >
+                  {player ? 'Save' : 'Create'}
+                </button>
+              </div>
+            </form>
+          </Dialog.Panel>
         </div>
-      </Dialog>
-    </Transition>
+      </div>
+    </Dialog>
   );
-} 
+}; 
