@@ -1,12 +1,13 @@
-import { Inter } from "next/font/google";
-import { Providers } from "@/components/Providers";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { ClientLayout } from '@/components/ClientLayout';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
-export const metadata = {
-  title: "Old Aged Footballers",
-  description: "Track and manage football games for old aged footballers",
+export const metadata: Metadata = {
+  title: 'Old Aged Footballers',
+  description: 'Track and manage football games for the Old Aged Footballers community',
 };
 
 export default function RootLayout({
@@ -17,9 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>
+        <ClientLayout>
           {children}
-        </Providers>
+        </ClientLayout>
       </body>
     </html>
   );

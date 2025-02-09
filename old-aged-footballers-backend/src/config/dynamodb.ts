@@ -1,6 +1,8 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 
+const isLocal = process.env.NODE_ENV !== 'production';
+
 // Table names with project prefix
 export const TableNames = {
   PLAYERS: 'oaf_players',
@@ -8,19 +10,13 @@ export const TableNames = {
   SIGNUPS: 'oaf_signups'
 } as const;
 
-// Create DynamoDB client
 const client = new DynamoDBClient({
-  region: 'local',
-  endpoint: 'http://localhost:8000',
-  credentials: {
-    accessKeyId: 'dummy',
-    secretAccessKey: 'dummy'
-  }
+  region: process.env.AWS_REGION || 'local',
+  endpoint: isLocal ? 'http://localhost:8000' : undefined,
+  credentials: isLocal ? {
+    accessKeyId: 'local',
+    secretAccessKey: 'local'
+  } : undefined,
 });
 
-// Create DocumentClient for easier DynamoDB interactions
-export const docClient = DynamoDBDocumentClient.from(client, {
-  marshallOptions: {
-    removeUndefinedValues: true,
-  },
-}); 
+export const dynamoDb = DynamoDBDocumentClient.from(client); 

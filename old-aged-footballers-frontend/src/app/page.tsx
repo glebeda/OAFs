@@ -1,69 +1,63 @@
-import { FaFutbol, FaChartBar, FaHistory, FaCog } from 'react-icons/fa';
+'use client';
+
 import Link from 'next/link';
+import { FaFutbol, FaHistory, FaUsers, FaFileAlt, FaTrophy } from 'react-icons/fa';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      {/* Hero Section */}
-      <section className="py-16 px-8">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-6 text-gray-800">
-            Old Aged Footballers
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Welcome to your football community hub. Track games, celebrate victories, and keep the spirit of football alive!
-          </p>
-        </div>
-      </section>
-
-      {/* Navigation Cards */}
-      <section className="px-8 pb-16">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Enter Game Details Card */}
-          <Link href="/game/new" className="group">
-            <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all p-6 text-center cursor-pointer border border-gray-100 hover:border-blue-500">
-              <div className="bg-blue-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <FaFutbol className="text-white text-2xl" />
-              </div>
-              <h2 className="text-xl font-semibold mb-2 text-gray-800">Enter Game Details</h2>
-              <p className="text-gray-600">Record a new game with our easy-to-use wizard</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-12">
+        <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">
+          Old Aged Footballers
+        </h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <Link href="/games/new" 
+            className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+            <div className="flex flex-col items-center text-center">
+              <FaFileAlt className="w-12 h-12 text-blue-500 mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">New Game</h2>
+              <p className="text-gray-600">Create and set up a new football game</p>
             </div>
           </Link>
 
-          {/* Dashboard Card */}
-          <Link href="/dashboard" className="group">
-            <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all p-6 text-center cursor-pointer border border-gray-100 hover:border-green-500">
-              <div className="bg-green-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <FaChartBar className="text-white text-2xl" />
-              </div>
-              <h2 className="text-xl font-semibold mb-2 text-gray-800">Dashboard</h2>
-              <p className="text-gray-600">View leaderboards, stats, and season highlights</p>
+          <Link href="/games/recent"
+            className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+            <div className="flex flex-col items-center text-center">
+              <FaFutbol className="w-12 h-12 text-green-500 mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Recent Game</h2>
+              <p className="text-gray-600">View and manage the most recent game</p>
             </div>
           </Link>
 
-          {/* Games Archive Card */}
-          <Link href="/games" className="group">
-            <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all p-6 text-center cursor-pointer border border-gray-100 hover:border-purple-500">
-              <div className="bg-purple-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <FaHistory className="text-white text-2xl" />
-              </div>
-              <h2 className="text-xl font-semibold mb-2 text-gray-800">Games Archive</h2>
-              <p className="text-gray-600">Browse through past games and results</p>
+          <Link href="/games/archive"
+            className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+            <div className="flex flex-col items-center text-center">
+              <FaHistory className="w-12 h-12 text-orange-500 mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Games Archive</h2>
+              <p className="text-gray-600">Browse and view past games</p>
             </div>
           </Link>
 
-          {/* Admin Card */}
-          <Link href="/admin" className="group">
-            <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all p-6 text-center cursor-pointer border border-gray-100 hover:border-orange-500">
-              <div className="bg-orange-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <FaCog className="text-white text-2xl" />
-              </div>
-              <h2 className="text-xl font-semibold mb-2 text-gray-800">Admin</h2>
-              <p className="text-gray-600">Manage players and system settings</p>
+          <Link href="/leaderboard"
+            className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+            <div className="flex flex-col items-center text-center">
+              <FaTrophy className="w-12 h-12 text-yellow-500 mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Leaderboard</h2>
+              <p className="text-gray-600">View player rankings and statistics</p>
+            </div>
+          </Link>
+
+          <Link href="/admin"
+            className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+            <div className="flex flex-col items-center text-center">
+              <FaUsers className="w-12 h-12 text-purple-500 mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Player Management</h2>
+              <p className="text-gray-600">Add, edit, or remove players</p>
             </div>
           </Link>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }
