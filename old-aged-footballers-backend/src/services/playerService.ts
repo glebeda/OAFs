@@ -1,5 +1,5 @@
 import { PutCommand, GetCommand, QueryCommand, DeleteCommand, UpdateCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
-import { docClient } from '../config/dynamodb';
+import { dynamoDb } from '../config/dynamodb';
 import { TableNames } from '../config/dynamodb';
 import { Player, CreatePlayerDto, UpdatePlayerDto } from '../types/player';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,7 +24,7 @@ export class PlayerService {
       updatedAt: now,
     };
 
-    await docClient.send(new PutCommand({
+    await dynamoDb.send(new PutCommand({
       TableName: this.tableName,
       Item: player,
     }));
@@ -33,7 +33,7 @@ export class PlayerService {
   }
 
   async getPlayerById(id: string): Promise<Player | null> {
-    const response = await docClient.send(new GetCommand({
+    const response = await dynamoDb.send(new GetCommand({
       TableName: this.tableName,
       Key: { id },
     }));
@@ -42,7 +42,7 @@ export class PlayerService {
   }
 
   async getPlayerByName(name: string): Promise<Player | null> {
-    const response = await docClient.send(new QueryCommand({
+    const response = await dynamoDb.send(new QueryCommand({
       TableName: this.tableName,
       IndexName: 'NameIndex',
       KeyConditionExpression: '#name = :name',
@@ -58,7 +58,7 @@ export class PlayerService {
   }
 
   async getAllPlayers(): Promise<Player[]> {
-    const response = await docClient.send(new ScanCommand({
+    const response = await dynamoDb.send(new ScanCommand({
       TableName: this.tableName,
     }));
 
@@ -98,7 +98,7 @@ export class PlayerService {
     expressionAttributeNames['#updatedAt'] = 'updatedAt';
     expressionAttributeValues[':updatedAt'] = new Date().toISOString();
 
-    const response = await docClient.send(new UpdateCommand({
+    const response = await dynamoDb.send(new UpdateCommand({
       TableName: this.tableName,
       Key: { id },
       UpdateExpression: `SET ${updateExpressions.join(', ')}`,
@@ -111,7 +111,7 @@ export class PlayerService {
   }
 
   async deletePlayer(id: string): Promise<void> {
-    await docClient.send(new DeleteCommand({
+    await dynamoDb.send(new DeleteCommand({
       TableName: this.tableName,
       Key: { id },
     }));
