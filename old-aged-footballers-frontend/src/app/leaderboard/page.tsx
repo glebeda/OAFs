@@ -23,17 +23,17 @@ function classNames(...classes: string[]) {
 const getMedalColor = (position: number) => {
   switch (position) {
     case 0: return 'text-yellow-400'; // Gold
-    case 1: return 'text-gray-400';   // Silver
+    case 1: return 'text-slate-400';  // Silver
     case 2: return 'text-amber-600';  // Bronze
-    default: return '';
+    default: return 'text-gray-400';
   }
 };
 
 const getPositionBackground = (position: number) => {
   switch (position) {
-    case 0: return 'bg-yellow-50';
-    case 1: return 'bg-gray-50';
-    case 2: return 'bg-amber-50';
+    case 0: return 'bg-yellow-50 border border-yellow-200';
+    case 1: return 'bg-slate-50 border border-slate-200';
+    case 2: return 'bg-amber-50 border border-amber-200';
     default: return 'bg-gray-50';
   }
 };
@@ -51,11 +51,11 @@ export default function LeaderboardPage() {
           listPlayers(),
         ]);
 
-        // Only consider archived games for statistics
-        const archivedGames = gamesData.filter(game => game.status === 'archived');
+        // Include both archived and recent games for statistics
+        const validGames = gamesData.filter(game => game.status === 'archived' || game.status === 'recent');
 
         // Calculate statistics
-        const stats = calculatePlayerStats(playersData, archivedGames);
+        const stats = calculatePlayerStats(playersData, validGames);
         setPlayerStats(stats);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -200,7 +200,7 @@ export default function LeaderboardPage() {
                             )}
                           />
                         ) : (
-                          <span className="text-lg font-semibold text-gray-400">
+                          <span className="text-sm font-medium text-gray-400 w-6 text-center">
                             #{index + 1}
                           </span>
                         )}
@@ -213,7 +213,11 @@ export default function LeaderboardPage() {
                       </span>
                     </div>
                     <span className={classNames(
-                      index < 3 ? 'text-gray-900 font-medium' : 'text-gray-600'
+                      'font-medium',
+                      index === 0 ? 'text-yellow-600' :
+                      index === 1 ? 'text-slate-600' :
+                      index === 2 ? 'text-amber-600' :
+                      'text-gray-500'
                     )}>
                       {category.renderStat(stat)}
                     </span>

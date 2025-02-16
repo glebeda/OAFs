@@ -13,12 +13,14 @@ export class GameService {
       id: uuidv4(),
       ...gameData,
       teamA: {
-        ...gameData.teamA,
+        players: gameData.teamA.players,
         playerGoals: {},
+        score: 0,
       },
       teamB: {
-        ...gameData.teamB,
+        players: gameData.teamB.players,
         playerGoals: {},
+        score: 0,
       },
       status: 'draft',
       createdAt: timestamp,
@@ -42,30 +44,48 @@ export class GameService {
     return result.Item as Game || null;
   }
 
-  async updateGame(id: string, updateData: UpdateGameDto): Promise<Game | null> {
+  private calculateTeamScore(playerGoals: Record<string, number>): number {
+    return Object.values(playerGoals).reduce((sum, goals) => sum + goals, 0);
+  }
+
+  async updateGame(id: string, updateData: UpdateGameDto): Promise<Game> {
     const timestamp = new Date().toISOString();
-    const updateExpressions: string[] = ['#updatedAt = :updatedAt'];
-    const expressionAttributeNames: Record<string, string> = { '#updatedAt': 'updatedAt' };
-    const expressionAttributeValues: Record<string, any> = { ':updatedAt': timestamp };
+    
+    // Get the current game state
+    const currentGame = await this.getGame(id);
+    if (!currentGame) {
+      throw new Error('Game not found');
+    }
 
-    Object.entries(updateData).forEach(([key, value]) => {
-      if (value !== undefined) {
-        updateExpressions.push(`#${key} = :${key}`);
-        expressionAttributeNames[`#${key}`] = key;
-        expressionAttributeValues[`:${key}`] = value;
-      }
-    });
+    // Prepare the update with score calculations if playerGoals are being updated
+    const updatedGame: Game = {
+      ...currentGame,
+      ...updateData,
+      teamA: {
+        ...currentGame.teamA,
+        ...(updateData.teamA || {}),
+      },
+      teamB: {
+        ...currentGame.teamB,
+        ...(updateData.teamB || {}),
+      },
+      updatedAt: timestamp,
+    };
 
-    const result = await dynamoDb.send(new UpdateCommand({
+    // Recalculate scores if playerGoals were updated
+    if (updateData.teamA?.playerGoals) {
+      updatedGame.teamA.score = this.calculateTeamScore(updatedGame.teamA.playerGoals);
+    }
+    if (updateData.teamB?.playerGoals) {
+      updatedGame.teamB.score = this.calculateTeamScore(updatedGame.teamB.playerGoals);
+    }
+
+    await dynamoDb.send(new PutCommand({
       TableName: this.tableName,
-      Key: { id },
-      UpdateExpression: `SET ${updateExpressions.join(', ')}`,
-      ExpressionAttributeNames: expressionAttributeNames,
-      ExpressionAttributeValues: expressionAttributeValues,
-      ReturnValues: 'ALL_NEW',
+      Item: updatedGame,
     }));
 
-    return result.Attributes as Game || null;
+    return updatedGame;
   }
 
   async listGames(): Promise<Game[]> {

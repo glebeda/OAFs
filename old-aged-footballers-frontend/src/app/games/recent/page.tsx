@@ -14,7 +14,6 @@ export default function RecentGamePage() {
   const [players, setPlayers] = useState<Record<string, Player>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,7 +57,6 @@ export default function RecentGamePage() {
     if (!game) return;
 
     try {
-      setSaving(true);
       const updatedGame = await updateGame(game.id, {
         [team]: {
           ...game[team],
@@ -69,12 +67,9 @@ export default function RecentGamePage() {
         },
       });
       setGame(updatedGame);
-      toast.success('Goals updated successfully');
     } catch (error) {
       console.error('Error updating goals:', error);
       toast.error('Failed to update goals');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -106,12 +101,6 @@ export default function RecentGamePage() {
         onGoalUpdate={handleGoalUpdate}
         isEditable={true}
       />
-
-      {saving && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-4">Saving changes...</div>
-        </div>
-      )}
     </div>
   );
 } 
