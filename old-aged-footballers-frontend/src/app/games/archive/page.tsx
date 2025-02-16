@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Game, Player } from '@/types';
 import { listGames } from '@/services/gameService';
 import { listPlayers } from '@/services/playerService';
-import toast from 'react-hot-toast';
+import { GameDisplay } from '@/components/GameDisplay';
 
 export default function GamesArchivePage() {
   const [games, setGames] = useState<Game[]>([]);
@@ -36,6 +36,11 @@ export default function GamesArchivePage() {
             {}
           )
         );
+
+        // Select the most recent game by default
+        if (archivedGames.length > 0) {
+          setSelectedGame(archivedGames[0]);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to load games data');
@@ -68,8 +73,8 @@ export default function GamesArchivePage() {
       <h1 className="text-2xl font-bold mb-8">Games Archive</h1>
       
       <div className="grid md:grid-cols-2 gap-8">
-        {/* Games List */}
-        <div className="bg-white rounded-lg shadow p-6">
+        {/* Games List - Desktop */}
+        <div className="hidden md:block bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Past Games</h2>
           {games.length === 0 ? (
             <p className="text-gray-500">No archived games found.</p>
@@ -91,7 +96,7 @@ export default function GamesArchivePage() {
                         {new Date(game.date).toLocaleDateString()}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Team A {game.teamA.score} - {game.teamB.score} Team B
+                        Bibs {game.teamA.score} - {game.teamB.score} Shirts
                       </p>
                     </div>
                     <div className="text-sm text-gray-500">
@@ -104,54 +109,33 @@ export default function GamesArchivePage() {
           )}
         </div>
 
+        {/* Games Dropdown - Mobile */}
+        <div className="md:hidden mb-6">
+          <select
+            value={selectedGame?.id || ''}
+            onChange={(e) => {
+              const game = games.find(g => g.id === e.target.value);
+              if (game) setSelectedGame(game);
+            }}
+            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 px-3"
+          >
+            <option value="" disabled>Select a game</option>
+            {games.map((game) => (
+              <option key={game.id} value={game.id}>
+                {new Date(game.date).toLocaleDateString()} - Bibs {game.teamA.score} : {game.teamB.score} Shirts
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Game Details */}
         {selectedGame && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Game Details</h2>
-            <div className="mb-4">
-              <p className="text-gray-600">
-                Date: {new Date(selectedGame.date).toLocaleDateString()}
-              </p>
-              {selectedGame.notes && (
-                <p className="text-gray-600 mt-2">Notes: {selectedGame.notes}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-8">
-              {/* Team A */}
-              <div className="border rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-3">
-                  Team A - {selectedGame.teamA.score} goals
-                </h3>
-                <div className="space-y-2">
-                  {selectedGame.teamA.players.map((playerId) => (
-                    <div key={playerId} className="flex justify-between items-center">
-                      <span>{players[playerId]?.name}</span>
-                      <span className="text-gray-600">
-                        {selectedGame.teamA.playerGoals[playerId] || 0} goals
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Team B */}
-              <div className="border rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-3">
-                  Team B - {selectedGame.teamB.score} goals
-                </h3>
-                <div className="space-y-2">
-                  {selectedGame.teamB.players.map((playerId) => (
-                    <div key={playerId} className="flex justify-between items-center">
-                      <span>{players[playerId]?.name}</span>
-                      <span className="text-gray-600">
-                        {selectedGame.teamB.playerGoals[playerId] || 0} goals
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <div className="md:col-start-2">
+            <GameDisplay
+              game={selectedGame}
+              players={players}
+              isEditable={false}
+            />
           </div>
         )}
       </div>

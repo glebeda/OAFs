@@ -6,6 +6,7 @@ import { Game, Player } from '@/types';
 import { getRecentGame, updateGame } from '@/services/gameService';
 import { listPlayers } from '@/services/playerService';
 import toast from 'react-hot-toast';
+import { GameDisplay } from '@/components/GameDisplay';
 
 export default function RecentGamePage() {
   const router = useRouter();
@@ -98,66 +99,13 @@ export default function RecentGamePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-8">Recent Game Results</h1>
-      <div className="mb-4">
-        <p className="text-gray-600">Date: {new Date(game.date).toLocaleDateString()}</p>
-        {game.notes && <p className="text-gray-600">Notes: {game.notes}</p>}
-      </div>
-
-      <div className="grid grid-cols-2 gap-8">
-        {/* Team A */}
-        <div className="border rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Team A - {game.teamA.score} goals
-          </h2>
-          <div className="space-y-4">
-            {game.teamA.players.map((playerId) => (
-              <div key={playerId} className="flex items-center justify-between">
-                <span>{players[playerId]?.name}</span>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="number"
-                    min="0"
-                    value={game.teamA.playerGoals[playerId] || 0}
-                    onChange={(e) =>
-                      handleGoalUpdate(playerId, 'teamA', parseInt(e.target.value) || 0)
-                    }
-                    className="w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                  <span className="text-sm text-gray-500">goals</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Team B */}
-        <div className="border rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Team B - {game.teamB.score} goals
-          </h2>
-          <div className="space-y-4">
-            {game.teamB.players.map((playerId) => (
-              <div key={playerId} className="flex items-center justify-between">
-                <span>{players[playerId]?.name}</span>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="number"
-                    min="0"
-                    value={game.teamB.playerGoals[playerId] || 0}
-                    onChange={(e) =>
-                      handleGoalUpdate(playerId, 'teamB', parseInt(e.target.value) || 0)
-                    }
-                    className="w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                  <span className="text-sm text-gray-500">goals</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <GameDisplay
+        game={game}
+        players={players}
+        onGoalUpdate={handleGoalUpdate}
+        isEditable={true}
+      />
 
       {saving && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
