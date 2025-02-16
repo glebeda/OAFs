@@ -10,9 +10,9 @@ export interface Game {
 }
 
 export interface TeamInfo {
-  players: string[]; // Player IDs
+  players: string[];
+  playerGoals: Record<string, number>;
   score: number;
-  playerGoals: Record<string, number>; // Player ID to goals mapping
 }
 
 export interface CreateGameDto {
@@ -20,11 +20,9 @@ export interface CreateGameDto {
   notes?: string;
   teamA: {
     players: string[];
-    score: number;
   };
   teamB: {
     players: string[];
-    score: number;
   };
 }
 

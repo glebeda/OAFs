@@ -51,11 +51,9 @@ export interface CreateGameDto {
   notes?: string;
   teamA: {
     players: string[];
-    score: number;
   };
   teamB: {
     players: string[];
-    score: number;
   };
 }
 
