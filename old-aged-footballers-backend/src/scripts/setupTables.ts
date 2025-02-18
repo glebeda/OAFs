@@ -1,12 +1,25 @@
 import { DynamoDB } from 'aws-sdk';
 import { TableNames } from '../config/dynamodb';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
+// Load environment variables based on NODE_ENV
 const isLocal = process.env.NODE_ENV !== 'production';
+const envFile = isLocal ? '.env' : '.env.production';
+dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+
+console.log('Using AWS Region:', process.env.AWS_REGION);
+
 const dynamodb = new DynamoDB({
-  region: process.env.AWS_REGION || 'local',
-  endpoint: isLocal ? 'http://localhost:8000' : undefined,
-  accessKeyId: isLocal ? 'local' : undefined,
-  secretAccessKey: isLocal ? 'local' : undefined,
+  region: process.env.AWS_REGION,
+  ...(isLocal ? {
+    endpoint: 'http://localhost:8000',
+    accessKeyId: 'local',
+    secretAccessKey: 'local'
+  } : {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  })
 });
 
 const tables = [
@@ -32,7 +45,7 @@ const tables = [
       },
     ],
     ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
-  },
+  }
 ];
 
 async function createTables() {
