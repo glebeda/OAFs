@@ -26,7 +26,18 @@ const tables = [
   {
     TableName: TableNames.PLAYERS,
     KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
-    AttributeDefinitions: [{ AttributeName: 'id', AttributeType: 'S' }],
+    AttributeDefinitions: [
+      { AttributeName: 'id', AttributeType: 'S' },
+      { AttributeName: 'name', AttributeType: 'S' }
+    ],
+    GlobalSecondaryIndexes: [
+      {
+        IndexName: 'NameIndex',
+        KeySchema: [{ AttributeName: 'name', KeyType: 'HASH' }],
+        Projection: { ProjectionType: 'ALL' },
+        ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
+      }
+    ],
     ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
   },
   {
