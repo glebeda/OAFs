@@ -11,24 +11,14 @@ export class PlayerController {
 
   async createPlayer(req: Request, res: Response) {
     try {
-      console.log('Creating player with data:', JSON.stringify(req.body, null, 2));
       const playerData: CreatePlayerDto = req.body;
       const player = await this.playerService.createPlayer(playerData);
       res.status(201).json(player);
     } catch (error) {
-      console.error('Detailed error in createPlayer:', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        body: req.body
-      });
-      
       if (error instanceof Error && error.message === 'Player with this name already exists') {
         res.status(409).json({ message: error.message });
       } else {
-        res.status(500).json({ 
-          message: 'Error creating player',
-          details: error instanceof Error ? error.message : 'Unknown error'
-        });
+        res.status(500).json({ message: 'Error creating player' });
       }
     }
   }

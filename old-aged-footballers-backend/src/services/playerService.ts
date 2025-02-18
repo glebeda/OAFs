@@ -8,45 +8,28 @@ export class PlayerService {
   private readonly tableName = TableNames.PLAYERS;
 
   async createPlayer(playerData: CreatePlayerDto): Promise<Player> {
-    try {
-      console.log('PlayerService: Starting player creation');
-      
-      // Check if player with this name already exists
-      console.log('PlayerService: Checking for existing player with name:', playerData.name);
-      const existingPlayer = await this.getPlayerByName(playerData.name);
-      if (existingPlayer) {
-        throw new Error('Player with this name already exists');
-      }
-
-      const now = new Date().toISOString();
-      const player: Player = {
-        id: uuidv4(),
-        ...playerData,
-        gamesPlayed: 0,
-        goalsScored: 0,
-        createdAt: now,
-        updatedAt: now,
-      };
-
-      console.log('PlayerService: Attempting to save player:', JSON.stringify(player, null, 2));
-      console.log('PlayerService: Using table:', this.tableName);
-
-      await dynamoDb.send(new PutCommand({
-        TableName: this.tableName,
-        Item: player,
-      }));
-
-      console.log('PlayerService: Player created successfully');
-      return player;
-    } catch (error) {
-      console.error('PlayerService: Error in createPlayer:', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        playerData,
-        tableName: this.tableName
-      });
-      throw error;
+    // Check if player with this name already exists
+    const existingPlayer = await this.getPlayerByName(playerData.name);
+    if (existingPlayer) {
+      throw new Error('Player with this name already exists');
     }
+
+    const now = new Date().toISOString();
+    const player: Player = {
+      id: uuidv4(),
+      ...playerData,
+      gamesPlayed: 0,
+      goalsScored: 0,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await dynamoDb.send(new PutCommand({
+      TableName: this.tableName,
+      Item: player,
+    }));
+
+    return player;
   }
 
   async getPlayerById(id: string): Promise<Player | null> {
