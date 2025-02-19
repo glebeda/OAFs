@@ -11,6 +11,28 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon-32x32.png',
   },
+  openGraph: {
+    title: 'OAFs',
+    description: 'Track and manage football games for the Old Age Footballers community',
+    url: 'https://oaf.playfootie.net/',
+    siteName: 'OAFs',
+    images: [
+      {
+        url: '/logo192.png',
+        width: 192,
+        height: 192,
+        alt: 'OAFs Logo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'OAFs',
+    description: 'Track and manage football games for the Old Age Footballers community',
+    images: ['/logo192.png'],
+  },
 };
 
 export default function RootLayout({
