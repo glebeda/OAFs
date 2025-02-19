@@ -54,7 +54,7 @@ export default function Navigation() {
         {/* Mobile Header */}
         <div className="bg-white shadow">
           <div className="px-4 h-16 flex items-center justify-between">
-            <span className="text-lg font-semibold">Old Aged Footballers</span>
+            <span className="text-lg font-semibold">Old Age Footballers</span>
             <button
               onClick={() => setIsDrawerOpen(true)}
               className="p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100"
