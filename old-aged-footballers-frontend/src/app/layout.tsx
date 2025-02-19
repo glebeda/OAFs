@@ -6,8 +6,11 @@ import { ClientLayout } from '@/components/ClientLayout';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Old Age Footballers',
+  title: 'OAFs',
   description: 'Track and manage football games for the Old Age Footballers community',
+  icons: {
+    icon: '/favicon-32x32.png',
+  },
 };
 
 export default function RootLayout({
