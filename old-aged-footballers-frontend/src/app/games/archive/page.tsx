@@ -5,6 +5,7 @@ import { Game, Player } from '@/types';
 import { listGames } from '@/services/gameService';
 import { listPlayers } from '@/services/playerService';
 import { GameDisplay } from '@/components/GameDisplay';
+import { CustomSelect } from '@/components/CustomSelect';
 
 export default function GamesArchivePage() {
   const [games, setGames] = useState<Game[]>([]);
@@ -68,6 +69,11 @@ export default function GamesArchivePage() {
     );
   }
 
+  const gameOptions = games.map(game => ({
+    value: game.id,
+    label: `${new Date(game.date).toLocaleDateString()} - Bibs ${game.teamA.score} : ${game.teamB.score} Shirts`,
+  }));
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-8">Games Archive</h1>
@@ -111,21 +117,16 @@ export default function GamesArchivePage() {
 
         {/* Games Dropdown - Mobile */}
         <div className="md:hidden mb-6">
-          <select
+          <CustomSelect
             value={selectedGame?.id || ''}
-            onChange={(e) => {
-              const game = games.find(g => g.id === e.target.value);
+            onChange={(value) => {
+              const game = games.find(g => g.id === value);
               if (game) setSelectedGame(game);
             }}
-            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 px-3"
-          >
-            <option value="" disabled>Select a game</option>
-            {games.map((game) => (
-              <option key={game.id} value={game.id}>
-                {new Date(game.date).toLocaleDateString()} - Bibs {game.teamA.score} : {game.teamB.score} Shirts
-              </option>
-            ))}
-          </select>
+            options={gameOptions}
+            label="Select a game"
+            placeholder="Choose a game to view"
+          />
         </div>
 
         {/* Game Details */}
