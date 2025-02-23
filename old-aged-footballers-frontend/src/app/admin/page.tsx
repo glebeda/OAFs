@@ -1,7 +1,7 @@
 'use client';
 
 import { FaUserPlus, FaSearch } from 'react-icons/fa';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Player, UpdatePlayerDto, CreatePlayerDto } from '@/types';
 import { PlayerFormModal } from '@/components/PlayerFormModal';
 import { DeleteConfirmationModal } from '@/components/DeleteConfirmationModal';
