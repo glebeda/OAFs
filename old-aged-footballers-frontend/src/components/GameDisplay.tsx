@@ -1,6 +1,7 @@
 import { Game, Player } from '@/types';
 import Image from 'next/image';
 import { FaFutbol } from 'react-icons/fa';
+import { GoalInput } from './GoalInput';
 
 // Static team emblems (we can make these dynamic later)
 const TEAM_A_EMBLEM = 'https://resources.premierleague.com/premierleague/badges/rb/t21.svg'; // West Ham
@@ -112,15 +113,12 @@ export function GameDisplay({ game, players, onGoalUpdate, isEditable = false }:
               <span className="font-medium">{players[playerId]?.name}</span>
               <div className="flex items-center space-x-3">
                 {isEditable ? (
-                  <input
-                    type="number"
-                    min="0"
+                  <GoalInput
                     value={game.teamA.playerGoals[playerId] || 0}
-                    onChange={(e) => onGoalUpdate?.(playerId, 'teamA', parseInt(e.target.value) || 0)}
-                    className="w-16 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-center"
+                    onChange={(goals) => onGoalUpdate?.(playerId, 'teamA', goals)}
                   />
                 ) : (
-                  <span className="w-16 text-center font-medium">
+                  <span className="w-8 text-center font-medium">
                     {game.teamA.playerGoals[playerId] || 0}
                   </span>
                 )}
@@ -139,15 +137,12 @@ export function GameDisplay({ game, players, onGoalUpdate, isEditable = false }:
               <span className="font-medium">{players[playerId]?.name}</span>
               <div className="flex items-center space-x-3">
                 {isEditable ? (
-                  <input
-                    type="number"
-                    min="0"
+                  <GoalInput
                     value={game.teamB.playerGoals[playerId] || 0}
-                    onChange={(e) => onGoalUpdate?.(playerId, 'teamB', parseInt(e.target.value) || 0)}
-                    className="w-16 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-center"
+                    onChange={(goals) => onGoalUpdate?.(playerId, 'teamB', goals)}
                   />
                 ) : (
-                  <span className="w-16 text-center font-medium">
+                  <span className="w-8 text-center font-medium">
                     {game.teamB.playerGoals[playerId] || 0}
                   </span>
                 )}
