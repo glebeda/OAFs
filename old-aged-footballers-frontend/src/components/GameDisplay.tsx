@@ -16,9 +16,9 @@ interface GameDisplayProps {
 
 export function GameDisplay({ game, players, onGoalUpdate, isEditable = false }: GameDisplayProps) {
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
       {/* Match Header */}
-      <div className="text-center mb-8">
+      <div className="text-center mb-4 sm:mb-8">
         <h1 className="text-xl text-gray-600 mb-2">
           {new Date(game.date).toLocaleDateString()}
         </h1>
@@ -26,7 +26,7 @@ export function GameDisplay({ game, players, onGoalUpdate, isEditable = false }:
       </div>
 
       {/* Match Display */}
-      <div className="flex flex-col sm:flex-row items-center justify-between mb-12">
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-12">
         {/* Team A */}
         <div className="hidden sm:flex flex-col items-center w-1/3">
           <div className="w-24 h-24 relative mb-4 flex items-center justify-center">
