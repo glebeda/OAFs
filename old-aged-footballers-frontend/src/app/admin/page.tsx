@@ -1,7 +1,7 @@
 'use client';
 
 import { FaUserPlus, FaSearch } from 'react-icons/fa';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Player, UpdatePlayerDto, CreatePlayerDto } from '@/types';
 import { PlayerFormModal } from '@/components/PlayerFormModal';
 import { DeleteConfirmationModal } from '@/components/DeleteConfirmationModal';
@@ -9,6 +9,7 @@ import { playerApi } from '@/lib/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { Spinner } from '@/components/Spinner';
 
 export default function AdminPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -112,8 +113,11 @@ export default function AdminPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-lg">Loading...</div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col items-center gap-4">
+          <Spinner size="lg" />
+          <p className="text-gray-600">Loading player data...</p>
+        </div>
       </div>
     );
   }

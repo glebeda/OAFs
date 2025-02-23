@@ -20,11 +20,16 @@ export default {
         'tap': {
           '0%, 100%': { backgroundColor: 'rgb(224 231 255)' },
           '50%': { backgroundColor: 'rgb(199 210 254)' },
+        },
+        'spin': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
         }
       },
       animation: {
         'fade-in': 'fade-in 0.5s ease-out',
-        'tap': 'tap 0.2s ease-in-out'
+        'tap': 'tap 0.2s ease-in-out',
+        'spin': 'spin 1s linear infinite'
       },
     },
   },

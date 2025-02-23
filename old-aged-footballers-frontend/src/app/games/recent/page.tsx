@@ -7,6 +7,7 @@ import { getRecentGame, updateGame } from '@/services/gameService';
 import { listPlayers } from '@/services/playerService';
 import toast from 'react-hot-toast';
 import { GameDisplay } from '@/components/GameDisplay';
+import { Spinner } from '@/components/Spinner';
 
 export default function RecentGamePage() {
   const router = useRouter();
@@ -76,7 +77,10 @@ export default function RecentGamePage() {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div>Loading game data...</div>
+        <div className="flex flex-col items-center gap-4">
+          <Spinner size="lg" />
+          <p className="text-gray-600">Loading recent game...</p>
+        </div>
       </div>
     );
   }

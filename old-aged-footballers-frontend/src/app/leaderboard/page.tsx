@@ -6,6 +6,7 @@ import { listGames } from '@/services/gameService';
 import { listPlayers } from '@/services/playerService';
 import { Tab } from '@headlessui/react';
 import { FaTrophy, FaFutbol, FaUsers, FaMedal } from 'react-icons/fa';
+import { Spinner } from '@/components/Spinner';
 
 interface PlayerStats {
   id: string;
@@ -116,7 +117,10 @@ export default function LeaderboardPage() {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div>Loading leaderboard data...</div>
+        <div className="flex flex-col items-center gap-4">
+          <Spinner size="lg" />
+          <p className="text-gray-600">Loading leaderboard data...</p>
+        </div>
       </div>
     );
   }

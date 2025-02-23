@@ -6,6 +6,7 @@ import { listGames } from '@/services/gameService';
 import { listPlayers } from '@/services/playerService';
 import { GameDisplay } from '@/components/GameDisplay';
 import { CustomSelect } from '@/components/CustomSelect';
+import { Spinner } from '@/components/Spinner';
 
 export default function GamesArchivePage() {
   const [games, setGames] = useState<Game[]>([]);
@@ -56,7 +57,10 @@ export default function GamesArchivePage() {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div>Loading games data...</div>
+        <div className="flex flex-col items-center gap-4">
+          <Spinner size="lg" />
+          <p className="text-gray-600">Loading games data...</p>
+        </div>
       </div>
     );
   }
