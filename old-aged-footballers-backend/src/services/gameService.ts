@@ -44,8 +44,12 @@ export class GameService {
     return result.Item as Game || null;
   }
 
-  private calculateTeamScore(playerGoals: Record<string, number>): number {
-    return Object.values(playerGoals).reduce((sum, goals) => sum + goals, 0);
+  private calculateTeamScore(playerGoals: Record<string, number>, oppositeTeamGoals: Record<string, number>): number {
+    // Sum up all positive goals for this team
+    const positiveGoals = Object.values(playerGoals).reduce((sum, goals) => sum + Math.max(0, goals), 0);
+    // Sum up all negative goals (own goals) from the opposite team
+    const ownGoalsFromOpposite = Object.values(oppositeTeamGoals).reduce((sum, goals) => sum + Math.abs(Math.min(0, goals)), 0);
+    return positiveGoals + ownGoalsFromOpposite;
   }
 
   async updateGame(id: string, updateData: UpdateGameDto): Promise<Game> {
@@ -72,12 +76,16 @@ export class GameService {
       updatedAt: timestamp,
     };
 
-    // Recalculate scores if playerGoals were updated
-    if (updateData.teamA?.playerGoals) {
-      updatedGame.teamA.score = this.calculateTeamScore(updatedGame.teamA.playerGoals);
-    }
-    if (updateData.teamB?.playerGoals) {
-      updatedGame.teamB.score = this.calculateTeamScore(updatedGame.teamB.playerGoals);
+    // Recalculate scores if playerGoals were updated for either team
+    if (updateData.teamA?.playerGoals || updateData.teamB?.playerGoals) {
+      updatedGame.teamA.score = this.calculateTeamScore(
+        updatedGame.teamA.playerGoals,
+        updatedGame.teamB.playerGoals
+      );
+      updatedGame.teamB.score = this.calculateTeamScore(
+        updatedGame.teamB.playerGoals,
+        updatedGame.teamA.playerGoals
+      );
     }
 
     await dynamoDb.send(new PutCommand({

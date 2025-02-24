@@ -5,9 +5,10 @@ interface GoalInputProps {
   value: number;
   onChange: (value: number) => void;
   max?: number;
+  min?: number;
 }
 
-export function GoalInput({ value, onChange, max = 99 }: GoalInputProps) {
+export function GoalInput({ value, onChange, max = 99, min = -99 }: GoalInputProps) {
   const [isDecrementTapped, setIsDecrementTapped] = useState(false);
   const [isIncrementTapped, setIsIncrementTapped] = useState(false);
 
@@ -20,7 +21,7 @@ export function GoalInput({ value, onChange, max = 99 }: GoalInputProps) {
   };
 
   const handleDecrement = () => {
-    if (value > 0) {
+    if (value > min) {
       setIsDecrementTapped(true);
       onChange(value - 1);
       setTimeout(() => setIsDecrementTapped(false), 200);
@@ -32,16 +33,18 @@ export function GoalInput({ value, onChange, max = 99 }: GoalInputProps) {
       <button
         type="button"
         onClick={handleDecrement}
-        disabled={value === 0}
+        disabled={value === min}
         className={`w-8 h-8 sm:w-7 sm:h-7 rounded-full flex items-center justify-center touch-manipulation
-          ${value === 0 
+          ${value === min 
             ? 'bg-gray-100 text-gray-400' 
             : `bg-indigo-100 text-indigo-600 ${isDecrementTapped ? 'animate-tap' : ''}`}`}
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
         <FaMinus className="w-2.5 h-2.5" />
       </button>
-      <span className="w-6 text-center text-base font-semibold select-none">{value}</span>
+      <span className={`w-8 text-center text-base font-semibold select-none ${value < 0 ? 'text-red-600' : ''}`}>
+        {value}
+      </span>
       <button
         type="button"
         onClick={handleIncrement}

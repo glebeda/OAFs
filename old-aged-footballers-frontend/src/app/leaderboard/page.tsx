@@ -80,11 +80,12 @@ export default function LeaderboardPage() {
     }));
 
     games.forEach(game => {
-      // Count goals
+      // Count goals for Team A
       game.teamA.players.forEach(playerId => {
         const playerStat = stats.find(s => s.id === playerId);
         if (playerStat) {
-          playerStat.totalGoals += game.teamA.playerGoals[playerId] || 0;
+          const goals = game.teamA.playerGoals[playerId] || 0;
+          playerStat.totalGoals += goals;
           playerStat.gamesPlayed += 1;
           if (game.teamA.score > game.teamB.score) {
             playerStat.wins += 1;
@@ -92,10 +93,12 @@ export default function LeaderboardPage() {
         }
       });
 
+      // Count goals for Team B
       game.teamB.players.forEach(playerId => {
         const playerStat = stats.find(s => s.id === playerId);
         if (playerStat) {
-          playerStat.totalGoals += game.teamB.playerGoals[playerId] || 0;
+          const goals = game.teamB.playerGoals[playerId] || 0;
+          playerStat.totalGoals += goals;
           playerStat.gamesPlayed += 1;
           if (game.teamB.score > game.teamA.score) {
             playerStat.wins += 1;
