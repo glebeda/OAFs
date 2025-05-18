@@ -68,13 +68,42 @@ export class GameService {
       teamA: {
         ...currentGame.teamA,
         ...(updateData.teamA || {}),
+        playerGoals: {
+          ...currentGame.teamA.playerGoals,
+          ...(updateData.teamA?.playerGoals || {}),
+        },
       },
       teamB: {
         ...currentGame.teamB,
         ...(updateData.teamB || {}),
+        playerGoals: {
+          ...currentGame.teamB.playerGoals,
+          ...(updateData.teamB?.playerGoals || {}),
+        },
       },
       updatedAt: timestamp,
     };
+
+    // Clean up goals for removed players
+    if (updateData.teamA?.players) {
+      const newPlayerGoals: Record<string, number> = {};
+      updateData.teamA.players.forEach(playerId => {
+        if (updatedGame.teamA.playerGoals[playerId] !== undefined) {
+          newPlayerGoals[playerId] = updatedGame.teamA.playerGoals[playerId];
+        }
+      });
+      updatedGame.teamA.playerGoals = newPlayerGoals;
+    }
+
+    if (updateData.teamB?.players) {
+      const newPlayerGoals: Record<string, number> = {};
+      updateData.teamB.players.forEach(playerId => {
+        if (updatedGame.teamB.playerGoals[playerId] !== undefined) {
+          newPlayerGoals[playerId] = updatedGame.teamB.playerGoals[playerId];
+        }
+      });
+      updatedGame.teamB.playerGoals = newPlayerGoals;
+    }
 
     // Recalculate scores if playerGoals were updated for either team
     if (updateData.teamA?.playerGoals || updateData.teamB?.playerGoals) {

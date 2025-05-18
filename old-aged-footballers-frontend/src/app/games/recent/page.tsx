@@ -8,6 +8,7 @@ import { listPlayers } from '@/services/playerService';
 import toast from 'react-hot-toast';
 import { GameDisplay } from '@/components/GameDisplay';
 import { Spinner } from '@/components/Spinner';
+import { FaEdit } from 'react-icons/fa';
 
 export default function RecentGamePage() {
   const router = useRouter();
@@ -99,6 +100,16 @@ export default function RecentGamePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Recent Game</h1>
+        <button
+          onClick={() => router.push(`/games/${game.id}/edit`)}
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          <FaEdit className="mr-2" />
+          Edit Game
+        </button>
+      </div>
       <GameDisplay
         game={game}
         players={players}

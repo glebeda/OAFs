@@ -18,10 +18,15 @@ export async function createGame(data: CreateGameDto): Promise<Game> {
 }
 
 export async function getGame(id: string): Promise<Game> {
-  const response = await fetch(`${API_BASE_URL}/games/${id}`);
+  const response = await fetch(`${API_BASE_URL}/games/${id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
   if (!response.ok) {
-    throw new Error('Failed to get game');
+    throw new Error('Failed to fetch game');
   }
 
   return response.json();
