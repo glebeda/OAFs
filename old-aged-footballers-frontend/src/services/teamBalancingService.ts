@@ -31,6 +31,16 @@ export interface TeamBalancingOptions {
   maxSuggestions?: number;
 }
 
+export interface BestPair {
+  idA: string;
+  idB: string;
+  nameA: string;
+  nameB: string;
+  gamesTogether: number;
+  gamesWonTogether: number;
+  winPercent: number;
+}
+
 export interface BalancingStats {
   totalGames: number;
   totalPlayers: number;
@@ -56,6 +66,7 @@ export interface BalancingStats {
     winRate: number;
   }>;
   recentGamesCount: number;
+  bestPairs: BestPair[];
 }
 
 /**

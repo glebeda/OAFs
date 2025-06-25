@@ -433,4 +433,56 @@ export class TeamBalancingService {
       );
     });
   }
+
+  /**
+   * Get best pairs based on win percentage and minimum games together
+   */
+  getBestPairs(playerRatings: PlayerRating[], games: Game[], topN: number = 5, minGamesTogether: number = 3) {
+    const pairStats: Record<string, { idA: string, idB: string, nameA: string, nameB: string, gamesTogether: number, gamesWonTogether: number, winPercent: number }> = {};
+    // For each unique pair
+    for (let i = 0; i < playerRatings.length; i++) {
+      for (let j = i + 1; j < playerRatings.length; j++) {
+        const a = playerRatings[i];
+        const b = playerRatings[j];
+        let gamesTogether = 0;
+        let gamesWonTogether = 0;
+        games.forEach(game => {
+          const allPlayers = [...game.teamA.players, ...game.teamB.players];
+          if (allPlayers.includes(a.id) && allPlayers.includes(b.id)) {
+            gamesTogether++;
+            // Check if they were on the same team and won
+            let sameTeam = false;
+            let won = false;
+            if (game.teamA.players.includes(a.id) && game.teamA.players.includes(b.id)) {
+              sameTeam = true;
+              won = game.teamA.score > game.teamB.score;
+            } else if (game.teamB.players.includes(a.id) && game.teamB.players.includes(b.id)) {
+              sameTeam = true;
+              won = game.teamB.score > game.teamA.score;
+            }
+            if (sameTeam && won) {
+              gamesWonTogether++;
+            }
+          }
+        });
+        if (gamesTogether >= minGamesTogether) {
+          const winPercent = gamesTogether > 0 ? (gamesWonTogether / gamesTogether) * 100 : 0;
+          pairStats[`${a.id}|${b.id}`] = {
+            idA: a.id,
+            idB: b.id,
+            nameA: a.name,
+            nameB: b.name,
+            gamesTogether,
+            gamesWonTogether,
+            winPercent
+          };
+        }
+      }
+    }
+    // Sort by winPercent descending, then by gamesTogether descending
+    const sorted = Object.values(pairStats)
+      .sort((a, b) => b.winPercent - a.winPercent || b.gamesTogether - a.gamesTogether)
+      .slice(0, topN);
+    return sorted;
+  }
 } 

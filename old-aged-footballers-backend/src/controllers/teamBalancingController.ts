@@ -138,6 +138,8 @@ export class TeamBalancingController {
         .slice(0, 5)
         .map(p => ({ id: p.id, name: p.name, winRate: p.winRate }));
 
+      const bestPairs = this.teamBalancingService.getBestPairs(playerRatings, validGames, 5, 3);
+
       res.json({
         totalGames: validGames.length,
         totalPlayers: players.length,
@@ -148,7 +150,8 @@ export class TeamBalancingController {
         bestWinRates,
         recentGamesCount: validGames.filter(g => 
           new Date(g.date) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Last 30 days
-        ).length
+        ).length,
+        bestPairs
       });
 
     } catch (error) {

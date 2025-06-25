@@ -160,7 +160,7 @@ export default function AnalyticsPage() {
                           </span>
                         </td>
                         <td className="text-center py-3 px-4">{player.goalsPerGame.toFixed(2)}</td>
-                        <td className="text-center py-3 px-4">{player.winRate.toFixed(1)}%</td>
+                        <td className="text-center py-3 px-4">{(player.winRate * 100).toFixed(1)}%</td>
                         <td className="text-center py-3 px-4">{player.gamesPlayed}</td>
                       </tr>
                     );
@@ -219,9 +219,31 @@ export default function AnalyticsPage() {
                     </div>
                     <span className="font-medium">{player.name}</span>
                   </div>
-                  <span className="text-sm text-gray-600">{player.winRate}%</span>
+                  <span className="text-sm text-gray-600">{(player.winRate * 100).toFixed(1)}%</span>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Best Pairs Widget */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-lg font-semibold mb-4">Best Pairs</h3>
+            <div className="space-y-3">
+              {stats.bestPairs && stats.bestPairs.length > 0 ? (
+                stats.bestPairs.map((pair, index) => (
+                  <div key={pair.idA + '-' + pair.idB} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 bg-violet-100 rounded-full flex items-center justify-center text-xs font-bold text-violet-600">
+                        {index + 1}
+                      </div>
+                      <span className="font-medium">{pair.nameA} &amp; {pair.nameB}</span>
+                    </div>
+                    <span className="text-sm text-gray-600">{pair.winPercent.toFixed(1)}% wins ({pair.gamesTogether} games)</span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-gray-500">Not enough data yet</div>
+              )}
             </div>
           </div>
         </div>
