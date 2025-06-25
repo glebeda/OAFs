@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { FaHome, FaFutbol, FaHistory, FaUsers, FaBars, FaTimes, FaFileAlt, FaTrophy } from 'react-icons/fa';
+import { FaHome, FaFutbol, FaHistory, FaUsers, FaBars, FaTimes, FaFileAlt, FaTrophy, FaChartBar } from 'react-icons/fa';
 
 const navigationItems = [
   { href: '/', label: 'Home', icon: FaHome },
@@ -12,6 +12,7 @@ const navigationItems = [
   { href: '/games/recent', label: 'Recent Game', icon: FaFutbol },
   { href: '/games/archive', label: 'Games Archive', icon: FaHistory },
   { href: '/leaderboard', label: 'Leaderboard', icon: FaTrophy },
+  { href: '/analytics', label: 'Analytics', icon: FaChartBar },
   { href: '/admin', label: 'Player Management', icon: FaUsers },
 ];
 
