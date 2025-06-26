@@ -39,6 +39,7 @@ export default function AutoTeamSelector({
   });
   const searchParams = useSearchParams();
   const showRatings = searchParams.get('showRatings') === '1';
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -102,7 +103,8 @@ export default function AutoTeamSelector({
     );
   };
 
-  const handleSuggestionSelect = (suggestion: TeamSuggestion) => {
+  const handleSuggestionSelect = (suggestion: TeamSuggestion, index: number) => {
+    setSelectedSuggestionIndex(index);
     onTeamSelection(suggestion.teamA, suggestion.teamB);
   };
 
@@ -141,7 +143,7 @@ export default function AutoTeamSelector({
       {/* Player Selection */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Select Available Players</h3>
+          <h3 className="text-lg font-semibold">Select Players</h3>
           <div className="text-sm text-gray-600">
             {selectedPlayers.length} selected
             {selectedPlayers.length >= 6 && (
@@ -302,8 +304,15 @@ export default function AutoTeamSelector({
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Team Suggestions</h3>
           {suggestions.map((suggestion, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="flex items-center justify-between mb-4">
+            <div
+              key={index}
+              className={`bg-white rounded-lg shadow-sm border p-6 transition-all relative ${
+                selectedSuggestionIndex === index
+                  ? 'border-blue-600 ring-2 ring-blue-200'
+                  : 'border-gray-200'
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2 sm:gap-0">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-600">Suggestion {index + 1}</span>
                   <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded">
@@ -311,10 +320,19 @@ export default function AutoTeamSelector({
                   </span>
                 </div>
                 <button
-                  onClick={() => handleSuggestionSelect(suggestion)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                  onClick={() => handleSuggestionSelect(suggestion, index)}
+                  className={`px-4 py-2 rounded-lg text-sm mt-2 sm:mt-0 transition-colors flex items-center justify-center gap-2
+                    ${selectedSuggestionIndex === index
+                      ? 'bg-gray-300 text-gray-600 cursor-not-allowed opacity-80'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'}
+                  `}
+                  disabled={selectedSuggestionIndex === index}
                 >
-                  Use This Team
+                  {selectedSuggestionIndex === index ? (
+                    <><FaCheck className="w-4 h-4" /> Teams Selected</>
+                  ) : (
+                    'Use These Teams'
+                  )}
                 </button>
               </div>
               

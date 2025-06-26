@@ -100,7 +100,7 @@ export default function HomePage() {
                 <FaChartBar className="w-8 h-8 text-cyan-500" />
               </div>
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">Analytics</h2>
-              <p className="text-gray-600 text-center">View team and player performance insights</p>
+              <p className="text-gray-600 text-center">View performance insights and team balancing statistics</p>
             </div>
           </Link>
         </div>

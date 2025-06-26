@@ -219,7 +219,7 @@ const GameWizard = () => {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold">Auto Team Balancing</h3>
-                      <p className="text-sm text-gray-600">AI-powered balanced team selection</p>
+                      <p className="text-sm text-gray-600">Balanced team selection</p>
                     </div>
                   </div>
                   <ul className="text-sm text-gray-600 space-y-1">

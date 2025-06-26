@@ -175,24 +175,7 @@ export default function AnalyticsPage() {
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h3 className="text-lg font-semibold mb-4">Most Active Players</h3>
-            <div className="space-y-3">
-              {stats.mostActivePlayers.map((player, index) => (
-                <div key={player.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-xs font-bold text-blue-600">
-                      {index + 1}
-                    </div>
-                    <span className="font-medium">{player.name}</span>
-                  </div>
-                  <span className="text-sm text-gray-600">{player.gamesPlayed} games</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h3 className="text-lg font-semibold mb-4">Top Scorers</h3>
+            <h3 className="text-lg font-semibold mb-4">Top Scorers (Goals/Game)</h3>
             <div className="space-y-3">
               {stats.topScorers.map((player, index) => (
                 <div key={player.id} className="flex items-center justify-between">
@@ -219,7 +202,7 @@ export default function AnalyticsPage() {
                     </div>
                     <span className="font-medium">{player.name}</span>
                   </div>
-                  <span className="text-sm text-gray-600">{(player.winRate * 100).toFixed(1)}%</span>
+                  <span className="text-sm text-gray-600">{(player.winRate * 100).toFixed(1)}% wins</span>
                 </div>
               ))}
             </div>
@@ -231,14 +214,14 @@ export default function AnalyticsPage() {
             <div className="space-y-3">
               {stats.bestPairs && stats.bestPairs.length > 0 ? (
                 stats.bestPairs.map((pair, index) => (
-                  <div key={pair.idA + '-' + pair.idB} className="flex items-center justify-between">
+                  <div key={pair.idA + '-' + pair.idB} className="flex flex-col md:flex-row md:items-center md:justify-between space-y-1 md:space-y-0">
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 bg-violet-100 rounded-full flex items-center justify-center text-xs font-bold text-violet-600">
                         {index + 1}
                       </div>
                       <span className="font-medium">{pair.nameA} &amp; {pair.nameB}</span>
                     </div>
-                    <span className="text-sm text-gray-600">{pair.winPercent.toFixed(1)}% wins ({pair.gamesTogether} games)</span>
+                    <span className="text-xs md:text-sm text-gray-600 ml-9 md:ml-2">{pair.winPercent.toFixed(1)}% wins ({pair.gamesWonTogether}/{pair.gamesTogether} games)</span>
                   </div>
                 ))
               ) : (
