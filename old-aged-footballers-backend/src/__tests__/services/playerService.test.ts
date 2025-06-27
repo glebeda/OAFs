@@ -1,27 +1,17 @@
 import { PlayerService } from '../../services/playerService';
 import { mockDynamoDb, mockPlayer, mockGetCommandOutput, mockPutCommandOutput, mockQueryCommandOutput, mockScanCommandOutput, mockUpdateCommandOutput, mockDeleteCommandOutput } from '../mocks/dynamodb';
-import { docClient } from '../../config/dynamodb';
+import { dynamoDb } from '../../config/dynamodb';
 
-// Mock the DynamoDB client and TableNames
-jest.mock('../../config/dynamodb', () => ({
-  docClient: {
-    send: jest.fn(),
-  },
-  TableNames: {
-    PLAYERS: 'oaf_players',
-    GAMES: 'oaf_games',
-    SIGNUPS: 'oaf_signups'
-  }
-}));
+let sendSpy: jest.Mock;
+let playerService: PlayerService;
+
+beforeEach(() => {
+  sendSpy = jest.spyOn(dynamoDb, 'send') as unknown as jest.Mock;
+  sendSpy.mockClear();
+  playerService = new PlayerService();
+});
 
 describe('PlayerService', () => {
-  let playerService: PlayerService;
-
-  beforeEach(() => {
-    playerService = new PlayerService();
-    jest.clearAllMocks();
-  });
-
   describe('createPlayer', () => {
     const createPlayerData = {
       name: 'John Doe',
@@ -33,9 +23,9 @@ describe('PlayerService', () => {
 
     it('should create a new player successfully', async () => {
       // Mock the getPlayerByName to return null (no existing player)
-      (docClient.send as jest.Mock).mockResolvedValueOnce({ Items: [] });
+      sendSpy.mockResolvedValueOnce({ Items: [] });
       // Mock the PutCommand
-      (docClient.send as jest.Mock).mockResolvedValueOnce(mockPutCommandOutput);
+      sendSpy.mockResolvedValueOnce(mockPutCommandOutput);
 
       const result = await playerService.createPlayer(createPlayerData);
 
@@ -51,7 +41,7 @@ describe('PlayerService', () => {
 
     it('should throw error if player with same name exists', async () => {
       // Mock the getPlayerByName to return an existing player
-      (docClient.send as jest.Mock).mockResolvedValueOnce(mockQueryCommandOutput);
+      sendSpy.mockResolvedValueOnce(mockQueryCommandOutput);
 
       await expect(playerService.createPlayer(createPlayerData))
         .rejects
@@ -61,14 +51,14 @@ describe('PlayerService', () => {
 
   describe('getPlayerById', () => {
     it('should return player when found', async () => {
-      (docClient.send as jest.Mock).mockResolvedValueOnce(mockGetCommandOutput);
+      sendSpy.mockResolvedValueOnce(mockGetCommandOutput);
 
       const result = await playerService.getPlayerById('123');
       expect(result).toEqual(mockPlayer);
     });
 
     it('should return null when player not found', async () => {
-      (docClient.send as jest.Mock).mockResolvedValueOnce({ Item: null });
+      sendSpy.mockResolvedValueOnce({ Item: null });
 
       const result = await playerService.getPlayerById('123');
       expect(result).toBeNull();
@@ -77,14 +67,14 @@ describe('PlayerService', () => {
 
   describe('getAllPlayers', () => {
     it('should return all players', async () => {
-      (docClient.send as jest.Mock).mockResolvedValueOnce(mockScanCommandOutput);
+      sendSpy.mockResolvedValueOnce(mockScanCommandOutput);
 
       const result = await playerService.getAllPlayers();
       expect(result).toEqual([mockPlayer]);
     });
 
     it('should return empty array when no players exist', async () => {
-      (docClient.send as jest.Mock).mockResolvedValueOnce({ Items: [] });
+      sendSpy.mockResolvedValueOnce({ Items: [] });
 
       const result = await playerService.getAllPlayers();
       expect(result).toEqual([]);
@@ -99,18 +89,18 @@ describe('PlayerService', () => {
 
     it('should update player successfully', async () => {
       // Mock getPlayerById
-      (docClient.send as jest.Mock).mockResolvedValueOnce(mockGetCommandOutput);
+      sendSpy.mockResolvedValueOnce(mockGetCommandOutput);
       // Mock getPlayerByName (for name uniqueness check)
-      (docClient.send as jest.Mock).mockResolvedValueOnce({ Items: [] });
+      sendSpy.mockResolvedValueOnce({ Items: [] });
       // Mock update command
-      (docClient.send as jest.Mock).mockResolvedValueOnce(mockUpdateCommandOutput);
+      sendSpy.mockResolvedValueOnce(mockUpdateCommandOutput);
 
       const result = await playerService.updatePlayer('123', updateData);
       expect(result).toEqual(mockPlayer);
     });
 
     it('should throw error if player not found', async () => {
-      (docClient.send as jest.Mock).mockResolvedValueOnce({ Item: null });
+      sendSpy.mockResolvedValueOnce({ Item: null });
 
       await expect(playerService.updatePlayer('123', updateData))
         .rejects
@@ -119,9 +109,9 @@ describe('PlayerService', () => {
 
     it('should throw error if new name already exists', async () => {
       // Mock getPlayerById
-      (docClient.send as jest.Mock).mockResolvedValueOnce(mockGetCommandOutput);
+      sendSpy.mockResolvedValueOnce(mockGetCommandOutput);
       // Mock getPlayerByName to return a different player with the same name
-      (docClient.send as jest.Mock).mockResolvedValueOnce({
+      sendSpy.mockResolvedValueOnce({
         Items: [{ ...mockPlayer, id: '456' }],
       });
 
@@ -133,7 +123,7 @@ describe('PlayerService', () => {
 
   describe('deletePlayer', () => {
     it('should delete player successfully', async () => {
-      (docClient.send as jest.Mock).mockResolvedValueOnce(mockDeleteCommandOutput);
+      sendSpy.mockResolvedValueOnce(mockDeleteCommandOutput);
 
       await expect(playerService.deletePlayer('123')).resolves.not.toThrow();
     });

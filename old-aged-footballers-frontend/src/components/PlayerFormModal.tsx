@@ -151,11 +151,15 @@ export const PlayerFormModal: React.FC<PlayerFormModalProps> = ({
                 </div>
 
                 <div>
+                  <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
                   <CustomSelect
+                    id="status"
                     value={formData.isActive.toString()}
                     onChange={(value) => setFormData(prev => ({ ...prev, isActive: value === 'true' }))}
                     options={statusOptions}
-                    label="Status"
+                    label={undefined}
                   />
                 </div>
 

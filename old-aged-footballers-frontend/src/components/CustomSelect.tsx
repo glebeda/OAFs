@@ -13,6 +13,7 @@ interface CustomSelectProps {
   options: Option[];
   label?: string;
   placeholder?: string;
+  id?: string;
 }
 
 export function CustomSelect({
@@ -21,6 +22,7 @@ export function CustomSelect({
   options,
   label,
   placeholder = 'Select an option',
+  id,
 }: CustomSelectProps) {
   const selectedOption = options.find(option => option.value === value);
 
@@ -33,7 +35,10 @@ export function CustomSelect({
       )}
       <Listbox value={value} onChange={onChange}>
         <div className="relative">
-          <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-white py-3 pl-4 pr-10 text-left border border-gray-300 focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-opacity-75 focus-visible:ring-offset-2 sm:text-sm shadow-sm">
+          <Listbox.Button
+            id={id}
+            className="relative w-full cursor-pointer rounded-lg bg-white py-3 pl-4 pr-10 text-left border border-gray-300 focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-opacity-75 focus-visible:ring-offset-2 sm:text-sm shadow-sm"
+          >
             <span className="block truncate">
               {selectedOption ? selectedOption.label : placeholder}
             </span>

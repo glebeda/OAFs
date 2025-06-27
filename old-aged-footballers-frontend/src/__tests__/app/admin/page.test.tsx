@@ -70,7 +70,7 @@ describe('AdminPage', () => {
     await act(async () => {
       renderWithProvider(<AdminPage />);
     });
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText(/Loading/i)).toBeInTheDocument();
   });
 
   it('shows error state when API fails', async () => {
