@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaFileAlt, FaFutbol, FaHistory, FaTrophy, FaUsers } from 'react-icons/fa';
+import { FaFileAlt, FaFutbol, FaHistory, FaTrophy, FaUsers, FaChartBar } from 'react-icons/fa';
 
 export default function HomePage() {
   return (
@@ -90,6 +90,17 @@ export default function HomePage() {
               </div>
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">Player Management</h2>
               <p className="text-gray-600 text-center">Add, edit, or remove players</p>
+            </div>
+          </Link>
+
+          {/* Analytics Card */}
+          <Link href="/analytics" className="transform transition-all duration-300 hover:scale-105 h-full">
+            <div className="bg-white rounded-xl shadow-md hover:shadow-xl p-8 flex flex-col items-center transition-all duration-300 h-full">
+              <div className="w-16 h-16 flex items-center justify-center bg-cyan-100 rounded-full mb-6">
+                <FaChartBar className="w-8 h-8 text-cyan-500" />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Analytics</h2>
+              <p className="text-gray-600 text-center">View performance insights and team balancing statistics</p>
             </div>
           </Link>
         </div>

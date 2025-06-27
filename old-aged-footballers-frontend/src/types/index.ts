@@ -72,3 +72,5 @@ export interface UpdateGameDto {
   };
   status?: 'draft' | 'recent' | 'archived';
 }
+
+export type { BestPair } from '../services/teamBalancingService';

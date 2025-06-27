@@ -12,5 +12,6 @@
       "dest": "src/index.ts"
     }
   ],
-  "regions": ["lhr1"]
+  "regions": ["lhr1"],
+  "ignoreCommand": "if [ \"$VERCEL_GIT_BRANCH\" != \"main\" ]; then echo 'Not main branch, skipping build.' && exit 0; fi"
 } 

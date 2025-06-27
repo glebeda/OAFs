@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createGame, updateGame, getRecentGame, archiveGame } from '@/services/gameService';
 import TeamSelection from '@/components/TeamSelection';
+import AutoTeamSelector from '@/components/AutoTeamSelector';
 import toast from 'react-hot-toast';
+import { FaMagic, FaUsers, FaFutbol } from 'react-icons/fa';
 
 interface GameFormData {
   date: string;
@@ -17,10 +19,54 @@ interface GameFormData {
   };
 }
 
+// Bouncing ball animation component
+function BouncingBall() {
+  return (
+    <div className="flex flex-col items-center justify-end h-24">
+      <div className="bouncy-ball">
+        <FaFutbol className="w-12 h-12 text-white" style={{ filter: 'drop-shadow(0 2px 8px #222)' }} />
+      </div>
+      <div className="bouncy-shadow" />
+      <style jsx>{`
+        .bouncy-ball {
+          animation: bounce 1.2s cubic-bezier(.28,.84,.42,1) infinite;
+          display: flex;
+          align-items: flex-end;
+        }
+        .bouncy-shadow {
+          width: 40px;
+          height: 10px;
+          background: rgba(0,0,0,0.18);
+          border-radius: 50%;
+          margin: 0 auto;
+          margin-top: -8px;
+          filter: blur(1px);
+          animation: shadow-bounce 1.2s cubic-bezier(.28,.84,.42,1) infinite;
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0) scaleY(1) scaleX(1); }
+          10% { transform: translateY(0) scaleY(0.9) scaleX(1.1); }
+          30% { transform: translateY(-60px) scaleY(1.1) scaleX(0.9); }
+          50% { transform: translateY(0) scaleY(0.95) scaleX(1.05); }
+          60% { transform: translateY(-20px) scaleY(1.05) scaleX(0.95); }
+          80% { transform: translateY(0) scaleY(1) scaleX(1); }
+        }
+        @keyframes shadow-bounce {
+          0%, 100% { transform: scaleX(1); opacity: 1; }
+          30% { transform: scaleX(0.7); opacity: 0.5; }
+          50% { transform: scaleX(1.1); opacity: 0.8; }
+          80% { transform: scaleX(1); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 const GameWizard = () => {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [teamSelectionMode, setTeamSelectionMode] = useState<'manual' | 'auto' | null>(null);
   const [formData, setFormData] = useState<GameFormData>({
     date: new Date().toISOString().split('T')[0],
     notes: '',
@@ -31,12 +77,16 @@ const GameWizard = () => {
       players: [],
     },
   });
+  const [effortIllusionActive, setEffortIllusionActive] = useState(false);
+  const [effortIllusionMessage, setEffortIllusionMessage] = useState('');
 
   const validateStep = (currentStep: number): boolean => {
     switch (currentStep) {
       case 1:
         return !!formData.date;
       case 2:
+        return teamSelectionMode !== null;
+      case 3:
         return formData.teamA.players.length > 0 && formData.teamB.players.length > 0;
       default:
         return false;
@@ -46,13 +96,15 @@ const GameWizard = () => {
   const handleNextStep = () => {
     if (!validateStep(step)) {
       if (step === 2) {
+        toast.error('Please select a team selection method');
+      } else if (step === 3) {
         toast.error('Please select players for both teams');
       } else {
         toast.error('Please fill in all required fields');
       }
       return;
     }
-    if (step === 2) {
+    if (step === 3) {
       handleSubmit();
     } else {
       setStep(step + 1);
@@ -100,6 +152,15 @@ const GameWizard = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAutoTeamSelection = (teamA: string[], teamB: string[]) => {
+    setFormData({
+      ...formData,
+      teamA: { ...formData.teamA, players: teamA },
+      teamB: { ...formData.teamB, players: teamB },
+    });
+    toast.success('Teams selected automatically!');
   };
 
   const renderStep = () => {
@@ -152,23 +213,67 @@ const GameWizard = () => {
         return (
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold mb-6">Team Selection</h2>
-              <TeamSelection
-                teamAPlayers={formData.teamA.players}
-                teamBPlayers={formData.teamB.players}
-                onTeamAChange={(players) =>
-                  setFormData({
-                    ...formData,
-                    teamA: { ...formData.teamA, players },
-                  })
-                }
-                onTeamBChange={(players) =>
-                  setFormData({
-                    ...formData,
-                    teamB: { ...formData.teamB, players },
-                  })
-                }
-              />
+              <h2 className="text-xl font-semibold mb-6">Choose Team Selection Method</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Manual Selection */}
+                <div
+                  className={`p-6 rounded-lg border-2 cursor-pointer transition-all ${
+                    teamSelectionMode === 'manual'
+                      ? 'border-indigo-500 bg-indigo-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  onClick={() => setTeamSelectionMode('manual')}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`p-3 rounded-lg ${
+                      teamSelectionMode === 'manual' ? 'bg-indigo-100' : 'bg-gray-100'
+                    }`}>
+                      <FaUsers className={`h-6 w-6 ${
+                        teamSelectionMode === 'manual' ? 'text-indigo-600' : 'text-gray-600'
+                      }`} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold">Manual Selection</h3>
+                      <p className="text-sm text-gray-600">Choose players manually for each team</p>
+                    </div>
+                  </div>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Full control over team composition</li>
+                    <li>• Traditional selection method</li>
+                    <li>• Good for small groups</li>
+                  </ul>
+                </div>
+
+                {/* Auto Selection */}
+                <div
+                  className={`p-6 rounded-lg border-2 cursor-pointer transition-all ${
+                    teamSelectionMode === 'auto'
+                      ? 'border-indigo-500 bg-indigo-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  onClick={() => setTeamSelectionMode('auto')}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`p-3 rounded-lg ${
+                      teamSelectionMode === 'auto' ? 'bg-indigo-100' : 'bg-gray-100'
+                    }`}>
+                      <FaMagic className={`h-6 w-6 ${
+                        teamSelectionMode === 'auto' ? 'text-indigo-600' : 'text-gray-600'
+                      }`} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold">Auto Team Balancing</h3>
+                      <p className="text-sm text-gray-600">Balanced team selection</p>
+                    </div>
+                  </div>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Based on historical performance</li>
+                    <li>• Considers team chemistry</li>
+                    <li>• Ensures player rotation</li>
+                  </ul>
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
@@ -181,8 +286,59 @@ const GameWizard = () => {
               </button>
               <button
                 onClick={handleNextStep}
-                disabled={loading}
+                disabled={loading || teamSelectionMode === null}
                 className="w-full sm:w-auto px-6 py-3 text-base font-medium text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-6">
+            {teamSelectionMode === 'manual' ? (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-xl font-semibold mb-6">Manual Team Selection</h2>
+                <TeamSelection
+                  teamAPlayers={formData.teamA.players}
+                  teamBPlayers={formData.teamB.players}
+                  onTeamAChange={(players) =>
+                    setFormData({
+                      ...formData,
+                      teamA: { ...formData.teamA, players },
+                    })
+                  }
+                  onTeamBChange={(players) =>
+                    setFormData({
+                      ...formData,
+                      teamB: { ...formData.teamB, players },
+                    })
+                  }
+                />
+              </div>
+            ) : (
+              <AutoTeamSelector
+                onTeamSelection={handleAutoTeamSelection}
+                initialTeamA={formData.teamA.players}
+                initialTeamB={formData.teamB.players}
+                onEffortIllusionChange={setEffortIllusionActive}
+                onEffortIllusionMessageChange={setEffortIllusionMessage}
+              />
+            )}
+
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+              <button
+                onClick={() => setStep(2)}
+                disabled={loading}
+                className="w-full sm:w-auto px-6 py-3 text-base font-medium text-gray-700 bg-white rounded-lg shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Back to Selection Method
+              </button>
+              <button
+                onClick={handleNextStep}
+                disabled={loading || formData.teamA.players.length === 0 || formData.teamB.players.length === 0}
+                className="w-full sm:w-auto px-6 py-3 text-base font-medium text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
               >
                 {loading ? 'Creating Game...' : 'Create Game'}
               </button>
@@ -195,42 +351,53 @@ const GameWizard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-6 max-w-lg md:max-w-5xl">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Game</h1>
-        
-        {/* Progress indicator */}
-        <div className="mb-6 max-w-lg mx-auto">
-          <div className="flex items-center justify-between">
-            {[1, 2].map((stepNumber) => (
-              <div
-                key={stepNumber}
-                className={`flex items-center ${stepNumber < 2 ? 'flex-1' : ''}`}
-              >
-                <div
-                  className={`h-10 w-10 rounded-full ${
-                    step >= stepNumber ? 'bg-indigo-600' : 'bg-gray-200'
-                  } flex items-center justify-center text-white font-medium`}
-                >
-                  {stepNumber}
-                </div>
-                {stepNumber < 2 && (
-                  <div
-                    className={`h-1 flex-1 mx-4 ${
-                      step > stepNumber ? 'bg-indigo-600' : 'bg-gray-200'
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
+    <>
+      {/* Overlay rendered at top level, not blurred */}
+      {effortIllusionActive && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center" style={{ background: 'rgba(0,0,0,0.7)' }}>
+          <BouncingBall />
+          <div className="mt-6 text-lg font-semibold text-white text-center px-6 drop-shadow-lg animate-pulse">
+            {effortIllusionMessage}
           </div>
         </div>
+      )}
+      <div className={`min-h-screen bg-gray-50 transition-all duration-300 ${effortIllusionActive ? 'filter blur-sm' : ''}` }>
+        <div className="container mx-auto px-4 py-6 max-w-lg md:max-w-5xl">
+          <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Game</h1>
+          
+          {/* Progress indicator */}
+          <div className="mb-6 max-w-lg mx-auto">
+            <div className="flex items-center justify-between">
+              {[1, 2, 3].map((stepNumber) => (
+                <div
+                  key={stepNumber}
+                  className={`flex items-center ${stepNumber < 3 ? 'flex-1' : ''}`}
+                >
+                  <div
+                    className={`h-10 w-10 rounded-full ${
+                      step >= stepNumber ? 'bg-indigo-600' : 'bg-gray-200'
+                    } flex items-center justify-center text-white font-medium`}
+                  >
+                    {stepNumber}
+                  </div>
+                  {stepNumber < 3 && (
+                    <div
+                      className={`h-1 flex-1 mx-4 ${
+                        step > stepNumber ? 'bg-indigo-600' : 'bg-gray-200'
+                      }`}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
 
-        <div className={step === 1 ? 'max-w-lg mx-auto' : ''}>
-          {renderStep()}
+          <div className={step === 1 ? 'max-w-lg mx-auto' : ''}>
+            {renderStep()}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

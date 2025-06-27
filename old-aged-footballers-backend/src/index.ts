@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import playerRoutes from './routes/playerRoutes';
 import gameRoutes from './routes/gameRoutes';
+import teamBalancingRoutes from './routes/teamBalancingRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(express.json());
 // Routes
 app.use('/api/players', playerRoutes);
 app.use('/api/games', gameRoutes);
+app.use('/api/team-balancing', teamBalancingRoutes);
 
 // Basic health check route
 app.get('/health', (req, res) => {
