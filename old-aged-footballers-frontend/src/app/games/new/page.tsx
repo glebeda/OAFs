@@ -362,7 +362,7 @@ const GameWizard = () => {
         </div>
       )}
       <div className={`min-h-screen bg-gray-50 transition-all duration-300 ${effortIllusionActive ? 'filter blur-sm' : ''}` }>
-        <div className="container mx-auto px-4 py-6 max-w-lg md:max-w-5xl">
+        <div className="container mx-auto px-4 py-6 max-w-lg md:max-w-5xl pb-16 sm:pb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Game</h1>
           
           {/* Progress indicator */}
