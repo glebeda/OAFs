@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Player } from '@/types';
 import { 
   getTeamSuggestions, 
@@ -18,12 +18,22 @@ interface AutoTeamSelectorProps {
   onTeamSelection: (teamA: string[], teamB: string[]) => void;
   initialTeamA?: string[];
   initialTeamB?: string[];
+  onEffortIllusionChange?: (active: boolean) => void;
+  onEffortIllusionMessageChange?: (message: string) => void;
 }
+
+const FUNNY_MESSAGES = [
+  'Calling Gurt to confirm the teams...',
+  'Consulting the football gods...',
+  'Crunching numbers and egos...'
+];
 
 export default function AutoTeamSelector({ 
   onTeamSelection, 
   initialTeamA = [], 
-  initialTeamB = [] 
+  initialTeamB = [], 
+  onEffortIllusionChange,
+  onEffortIllusionMessageChange
 }: AutoTeamSelectorProps) {
   const [loading, setLoading] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -40,6 +50,7 @@ export default function AutoTeamSelector({
   const searchParams = useSearchParams();
   const showRatings = searchParams.get('showRatings') === '1';
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState<number | null>(null);
+  const firstSuggestionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -78,20 +89,34 @@ export default function AutoTeamSelector({
 
     // Calculate team size based on number of selected players
     const teamSize = Math.floor(selectedPlayers.length / 2);
-    
+
+    if (typeof onEffortIllusionChange === 'function') onEffortIllusionChange(true);
+    if (typeof onEffortIllusionMessageChange === 'function') onEffortIllusionMessageChange(FUNNY_MESSAGES[Math.floor(Math.random() * FUNNY_MESSAGES.length)]);
     setLoading(true);
     try {
-      const result = await getTeamSuggestions(selectedPlayers, {
+      const resultPromise = getTeamSuggestions(selectedPlayers, {
         ...options,
         minTeamSize: teamSize,
         maxTeamSize: teamSize,
       });
+      // Wait for both: backend and at least 3 seconds
+      const [result] = await Promise.all([
+        resultPromise,
+        new Promise(res => setTimeout(res, 3000))
+      ]);
       setSuggestions(result.suggestions);
+      setTimeout(() => {
+        if (firstSuggestionRef.current) {
+          firstSuggestionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100); // slight delay to ensure DOM update
     } catch (error) {
       console.error('Error generating suggestions:', error);
       alert('Failed to generate team suggestions');
     } finally {
       setLoading(false);
+      if (typeof onEffortIllusionChange === 'function') onEffortIllusionChange(false);
+      if (typeof onEffortIllusionMessageChange === 'function') onEffortIllusionMessageChange('');
     }
   };
 
@@ -155,7 +180,7 @@ export default function AutoTeamSelector({
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
-          {players.map(player => {
+          {[...players].sort((a, b) => a.name.localeCompare(b.name)).map(player => {
             const rating = getPlayerRating(player.id);
             const skillLevel = rating ? getSkillLevel(rating.skillRating) : null;
             const isSelected = selectedPlayers.includes(player.id);
@@ -199,20 +224,19 @@ export default function AutoTeamSelector({
       </div>
 
       {/* Advanced Options */}
-      <div className="bg-white rounded-lg shadow-sm border p-6">
+      <div className="sm:bg-white sm:rounded-lg sm:shadow-sm sm:border sm:p-6 p-0 mb-2">
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 px-2 py-1 text-sm rounded-md w-auto"
         >
           <FaCog className="h-4 w-4" />
           <span>Advanced Options</span>
         </button>
-        
         {showAdvanced && (
-          <div className="mt-4 space-y-4">
+          <div className="mt-3 sm:mt-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Skill Weight
                 </label>
                 <input
@@ -233,7 +257,7 @@ export default function AutoTeamSelector({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Chemistry Weight
                 </label>
                 <input
@@ -254,7 +278,7 @@ export default function AutoTeamSelector({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Rotation Weight
                 </label>
                 <input
@@ -306,6 +330,7 @@ export default function AutoTeamSelector({
           {suggestions.map((suggestion, index) => (
             <div
               key={index}
+              ref={index === 0 ? firstSuggestionRef : undefined}
               className={`bg-white rounded-lg shadow-sm border p-6 transition-all relative ${
                 selectedSuggestionIndex === index
                   ? 'border-blue-600 ring-2 ring-blue-200'
@@ -339,7 +364,7 @@ export default function AutoTeamSelector({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Team A */}
                 <div>
-                  <h4 className="font-medium text-blue-600 mb-3">Team A (Bibs)</h4>
+                  <h4 className="font-medium text-blue-600 mb-3">Bibs</h4>
                   <div className="space-y-2">
                     {suggestion.teamA.map(playerId => {
                       const player = players.find(p => p.id === playerId);
@@ -360,7 +385,7 @@ export default function AutoTeamSelector({
                 
                 {/* Team B */}
                 <div>
-                  <h4 className="font-medium text-red-600 mb-3">Team B (Shirts)</h4>
+                  <h4 className="font-medium text-red-600 mb-3">Shirts</h4>
                   <div className="space-y-2">
                     {suggestion.teamB.map(playerId => {
                       const player = players.find(p => p.id === playerId);
