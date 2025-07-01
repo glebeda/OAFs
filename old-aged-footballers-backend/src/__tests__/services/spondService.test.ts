@@ -1,8 +1,9 @@
 import { SpondService } from '../../services/spondService';
 import { PlayerService } from '../../services/playerService';
 
-jest.mock('node-fetch', () => jest.fn());
-const fetch = require('node-fetch');
+// Mock global fetch
+const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>;
+global.fetch = mockFetch;
 
 const mockPlayerService = {
   getAllPlayers: jest.fn(),
@@ -20,26 +21,26 @@ describe('SpondService', () => {
   });
 
   it('should fail authentication with bad credentials', async () => {
-    fetch.mockResolvedValueOnce({ ok: false, status: 401, statusText: 'Unauthorized' });
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 401, statusText: 'Unauthorized' } as Response);
     const result = await spondService.authenticate();
     expect(result).toBe(false);
   });
 
   it('should succeed authentication with good credentials', async () => {
-    fetch.mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         accessToken: { token: 'abc', expiration: new Date(Date.now() + 10000).toISOString() },
         refreshToken: {},
         passwordToken: {},
       }),
-    });
+    } as Response);
     const result = await spondService.authenticate();
     expect(result).toBe(true);
   });
 
   it('should enforce rate limiting', async () => {
-    fetch.mockResolvedValue({ ok: false, status: 401, statusText: 'Unauthorized' });
+    mockFetch.mockResolvedValue({ ok: false, status: 401, statusText: 'Unauthorized' } as Response);
     // Call authenticate 15 times to hit the limit
     for (let i = 0; i < 15; i++) {
       await spondService.authenticate();
