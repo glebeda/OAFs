@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import playerRoutes from './routes/playerRoutes';
 import gameRoutes from './routes/gameRoutes';
 import teamBalancingRoutes from './routes/teamBalancingRoutes';
+import spondRoutes from './routes/spondRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use('/api/players', playerRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/team-balancing', teamBalancingRoutes);
+app.use('/api/spond', spondRoutes);
 
 // Basic health check route
 app.get('/health', (req, res) => {

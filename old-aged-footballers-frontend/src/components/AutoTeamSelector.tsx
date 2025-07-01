@@ -13,6 +13,7 @@ import { listPlayers } from '@/services/playerService';
 import { FaMagic, FaCog, FaCheck } from 'react-icons/fa';
 import { Spinner } from './Spinner';
 import { useSearchParams } from 'next/navigation';
+import SpondIntegration from './SpondIntegration';
 
 interface AutoTeamSelectorProps {
   onTeamSelection: (teamA: string[], teamB: string[]) => void;
@@ -20,6 +21,7 @@ interface AutoTeamSelectorProps {
   initialTeamB?: string[];
   onEffortIllusionChange?: (active: boolean) => void;
   onEffortIllusionMessageChange?: (message: string) => void;
+  gameDate?: string; // Add game date prop for Spond integration
 }
 
 const FUNNY_MESSAGES = [
@@ -33,7 +35,8 @@ export default function AutoTeamSelector({
   initialTeamA = [], 
   initialTeamB = [], 
   onEffortIllusionChange,
-  onEffortIllusionMessageChange
+  onEffortIllusionMessageChange,
+  gameDate
 }: AutoTeamSelectorProps) {
   const [loading, setLoading] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -133,6 +136,10 @@ export default function AutoTeamSelector({
     onTeamSelection(suggestion.teamA, suggestion.teamB);
   };
 
+  const handleSpondPlayersImported = (playerIds: string[]) => {
+    setSelectedPlayers(playerIds);
+  };
+
   const getPlayerRating = (playerId: string) => {
     return playerRatings.find(r => r.id === playerId);
   };
@@ -164,6 +171,14 @@ export default function AutoTeamSelector({
           Team balancing based on historical performance, chemistry, and player rotation
         </p>
       </div>
+
+      {/* Spond Integration */}
+      {gameDate && (
+        <SpondIntegration
+          gameDate={gameDate}
+          onPlayersImported={handleSpondPlayersImported}
+        />
+      )}
 
       {/* Player Selection */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -405,33 +420,31 @@ export default function AutoTeamSelector({
                 </div>
               </div>
               
-              {/* Scores */}
-              <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t">
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Balance</p>
-                  <p className="text-lg font-bold text-blue-600">{suggestion.balanceScore.toFixed(1)}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Chemistry</p>
-                  <p className="text-lg font-bold text-green-600">{suggestion.chemistryScore.toFixed(1)}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Rotation</p>
-                  <p className="text-lg font-bold text-purple-600">{suggestion.rotationScore.toFixed(1)}</p>
-                </div>
-              </div>
-              
               {/* Reasoning */}
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-sm font-medium text-gray-700 mb-2">Why this team?</p>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  {suggestion.reasoning.map((reason, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <FaCheck className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
-                      {reason}
-                    </li>
-                  ))}
-                </ul>
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <h5 className="font-medium text-gray-700 mb-2">Why this works:</h5>
+                {Array.isArray(suggestion.reasoning) ? (
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    {suggestion.reasoning.map((reason, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <FaCheck className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                        {reason}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-sm text-gray-600 space-y-1">
+                    {String(suggestion.reasoning)
+                      .split(/\n|(?<=\.) /)
+                      .filter(Boolean)
+                      .map((part, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <FaCheck className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span>{part.trim()}</span>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}
