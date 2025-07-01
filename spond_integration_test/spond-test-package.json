@@ -1,0 +1,16 @@
+{
+  "name": "spond-api-test",
+  "version": "1.0.0",
+  "description": "Test script for Spond API integration",
+  "main": "spond-api-test.js",
+  "scripts": {
+    "test": "node spond-api-test.js",
+    "start": "node spond-api-test.js"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "keywords": ["spond", "api", "test"],
+  "author": "OAFs Team",
+  "license": "MIT"
+} 

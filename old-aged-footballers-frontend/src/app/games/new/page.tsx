@@ -324,6 +324,7 @@ const GameWizard = () => {
                 initialTeamB={formData.teamB.players}
                 onEffortIllusionChange={setEffortIllusionActive}
                 onEffortIllusionMessageChange={setEffortIllusionMessage}
+                gameDate={formData.date}
               />
             )}
 
